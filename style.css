@@ -280,61 +280,64 @@ html,body {
         align-items: center;
         text-align: center;
         padding: 5vw;
-        min-height: auto; 
+        min-height: 100vh; 
     }
     
     .myname {
-        font-size: 15vw; 
-        order: 1; /* Changed order to put name at the bottom */
-        margin: 30px auto 0 auto; 
+        font-size: 10vw; 
+        order: 3; 
+        margin: 5px auto 0 auto;
         position: static;
         left: auto;
         top: auto;
+        line-height: 1.0;
     }
     
     .right {
-        order: 2; /* Positioned between image and name */
-        position: static; /* Must be static for Flexbox flow */
+        order: 2; 
+        position: static; 
         width: 100%;
         min-height: unset;
         display: flex;
         flex-direction: column;
         align-items: center;
-        margin-bottom: 20px; /* Space between metadata and name */
+        margin-bottom: 0;
     }
-    
-    /* Image Positioning */
+
     .me {
         position: static; 
         height: auto;
-        width: 70%; 
-        max-width: 300px;
+        width: 50%; 
+        max-width: 250px;
         transform: rotate(0deg); 
-        margin-top: 10px;
-        margin-bottom: 10px; 
-        order: 3; /* Position image at the top */
+        margin-top: 140px;
+        margin-bottom: 5px;
+        order: 1; 
     }
 
-    /* Metadata Positioning */
-    /* All metadata children must be made position: static to flow correctly */
     .rc, .cs, .student {
-        position: static; 
-        margin: 5px auto;
+        position:relative; 
+        margin: 2px auto;
+        top: 90px;
         right: auto;
         left: auto;
-        width: 100%; 
+        width: 80%; 
         text-align: center;
     }
     
     .rc {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
+        margin-top: 10px;
+    }
+    
+    .cs {
+        font-size: 0.8rem;
     }
     
     .student {
-        font-size: 0.8rem;
+        font-size: 0.7rem;
     }
 
-    /* ABOUT SECTION CHANGES */
     #about h2 {
         font-size: 10vw;
         margin-left: 5vw;
@@ -344,6 +347,7 @@ html,body {
         max-width: 90%;
         margin-left: 5vw;
         font-size: 1rem;
+        margin-bottom: 15vh;
     }
     
     .dot {
@@ -351,7 +355,6 @@ html,body {
         left: 2vw;
     }
     
-    /* SKILLS SECTION CHANGES */
     .skills-container {
         grid-template-columns: 1fr; 
         width: 90%;
@@ -362,8 +365,7 @@ html,body {
     .skillbox {
         min-height: 150px;
     }
-    
-    /* CONTACT SECTION CHANGES */
+
     .contact-container {
         gap: 20px;
     }

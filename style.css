@@ -338,36 +338,51 @@ html,body {
         font-size: 0.7rem;
     }
 
-    #about h2 {
+   #about h2 {
         font-size: 10vw;
         margin-left: 5vw;
-        margin-top: 100px;
+        /* FIX: Reduced top margin significantly to pull content up */
+        margin-top: 50px; 
     }
     #about p {
         max-width: 90%;
         margin-left: 5vw;
-        font-size: 1rem;
-        margin-bottom: 15vh;
+        font-size: 0.95rem; /* FIX: Reduced font size slightly */
+        /* FIX: Removed margin-bottom that pushed content off screen */
+        margin-bottom: 5vh; 
     }
     
     .dot {
-        top: 100px;
+        top: 50px; /* FIX: Adjusted position to match reduced h2 margin-top */
         left: 2vw;
     }
     
+    /* SKILLS SECTION CHANGES */
+    #skills {
+        padding-top: 5vh; /* FIX: Reduced top padding to pull content up */
+        padding-bottom: 5vh; /* Added bottom padding for spacing */
+    }
     .skills-container {
         grid-template-columns: 1fr; 
         width: 90%;
+        gap: 20px; /* FIX: Reduced gap between skillboxes */
     }
     #skills h2 {
         font-size: 10vw;
+        margin-bottom: 30px; /* FIX: Reduced margin */
     }
     .skillbox {
-        min-height: 150px;
+        min-height: unset; /* FIX: Let content define height */
+        padding: 20px;
     }
-
+    
+    /* CONTACT SECTION CHANGES */
     .contact-container {
         gap: 20px;
+    }
+    #contact h2 {
+        font-size: 10vw;
+        margin-bottom: 30px;
     }
     .contact-item img {
         width: 30px;

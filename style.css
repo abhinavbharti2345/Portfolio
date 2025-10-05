@@ -1,0 +1,378 @@
+/* navigation bar */
+header {
+  display: flex;
+  justify-content: center;
+  padding: 0rem;
+}
+
+nav.pill {
+  background: rgba(179, 179, 179, 0.122);
+  backdrop-filter: blur(8px);
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.214);
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  position: fixed;
+  top: 15px;
+}
+
+nav.pill a {
+  text-decoration: none;
+  color: #333;
+  padding: 0.5rem .85rem;
+  border-radius: 9999px;
+}
+
+nav.pill a:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
+}
+
+/* Webpage content */
+section {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  border: solid rgba(0, 0, 0, 0);
+  scroll-snap-align: start;
+  box-sizing: border-box;
+}
+html,body {
+   margin: 0;
+  padding: 0;
+}
+
+/* home */
+#home {
+  background-color: #F0EDE9;
+}
+
+.myname {
+  font-family: 'Bebas Neue', sans-serif;
+  font-weight: 700;
+  color: #282828;
+  font-size: 6rem;
+  position: relative;
+  top: 100px;
+  left: 170px;
+}
+
+.rc {
+  font-family: 'Roboto Mono', monospace;
+  color: #8BA890;
+  font-size: 1.8rem;
+  position: absolute;
+  top: 200px;
+  right: 140px;
+  z-index: 10;
+}
+
+.cs {
+  position: absolute;
+  top: 275px;
+  right: 142px;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #282828 opacity: 0.85;
+  margin: 0;
+}
+
+.student {
+    position: absolute;
+    top: 305px;
+    right: 130px;
+    text-align: center;
+    width: 280px;
+    white-space: normal; 
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #4A4A4A;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.me {
+  display: flex;
+  height: 60vh;
+  position: absolute;
+  bottom: 0;
+  right: 33%;
+}
+
+/* about */
+#about {
+  background-color: #F0EDE9;
+}
+
+
+#about h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 4.5rem;
+  color: #282828;
+  margin-top: 150px;
+  margin-left: 170px;
+  margin-bottom: 30px;
+  position: relative;
+  z-index: 2;
+}
+
+#about p {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: #4A4A4A;
+  max-width: 800px;
+  margin-left: 170px;
+}
+
+.dot {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  background-color: #8BA890;
+  top: 200px;
+  left: 120px;
+  transform: rotate(15deg);
+  z-index: 1;
+}
+
+/* skills */
+#skills {
+  background-color: #F0EDE9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.skills-container {
+  width: 80%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+/* HEADING STYLE */
+#skills h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 4.5rem;
+  color: #282828;
+  grid-column: 1 / -1;
+  margin-bottom: 50px;
+  margin-top: -150px;
+}
+
+.skillbox {
+  background: rgba(179, 179, 179, 0.122);
+  backdrop-filter: blur(8px);
+  border-radius: 50px;
+  padding: 30px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  min-height: 250px;
+  transition: transform 0.3s ease;
+}
+
+
+.skillbox:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* INNER TEXT STYLES */
+.skillbox h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem;
+  color: #1D3557;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.skillbox p {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  color: #4A4A4A;
+  line-height: 1.5;
+}
+
+.skillbox.web-dev h3 {
+  color: #8BA890;}
+
+  .skillbox.other h3 {
+    color: #DA9074;
+  }
+
+  /* contacts */
+
+#contact {
+    background-color: #F0EDE9; 
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    justify-content: center; 
+    min-height: 100vh;
+}
+
+#contact h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 4.5rem;
+    color: #282828;
+    margin-bottom: 50px;
+    margin-top: 0; 
+}
+
+.contact-container {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    justify-content: center;
+}
+
+.contact-item {
+    display: block; 
+    padding: 15px;
+    border-radius: 50%;
+    background: rgba(179, 179, 179, 0.122);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.contact-item:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 8px 15px rgba(139, 168, 144, 0.5);
+}
+
+.contact-item img {
+    width: 35px;
+    height: 35px;
+    display: block;
+}
+
+.contact-item:first-child img {
+    width: 40px;
+    height: 30px;
+}
+
+.meta-data {
+    position: absolute;
+    top: 150px;
+    right: 140px;
+    z-index: 2; 
+}
+
+/* ------------------------ */
+/* Resposive to smartphone */
+@media (max-width: 768px) {
+    /* HOME SECTION LAYOUT CHANGE */
+    #home {
+        display: flex;
+        flex-direction: column; 
+        align-items: center;
+        text-align: center;
+        padding: 5vw;
+        min-height: auto; 
+    }
+    
+    .myname {
+        font-size: 15vw; 
+        order: 1; /* Changed order to put name at the bottom */
+        margin: 30px auto 0 auto; 
+        position: static;
+        left: auto;
+        top: auto;
+    }
+    
+    .right {
+        order: 2; /* Positioned between image and name */
+        position: static; /* Must be static for Flexbox flow */
+        width: 100%;
+        min-height: unset;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 20px; /* Space between metadata and name */
+    }
+    
+    /* Image Positioning */
+    .me {
+        position: static; 
+        height: auto;
+        width: 70%; 
+        max-width: 300px;
+        transform: rotate(0deg); 
+        margin-top: 10px;
+        margin-bottom: 10px; 
+        order: 3; /* Position image at the top */
+    }
+
+    /* Metadata Positioning */
+    /* All metadata children must be made position: static to flow correctly */
+    .rc, .cs, .student {
+        position: static; 
+        margin: 5px auto;
+        right: auto;
+        left: auto;
+        width: 100%; 
+        text-align: center;
+    }
+    
+    .rc {
+        font-size: 1.2rem;
+    }
+    
+    .student {
+        font-size: 0.8rem;
+    }
+
+    /* ABOUT SECTION CHANGES */
+    #about h2 {
+        font-size: 10vw;
+        margin-left: 5vw;
+        margin-top: 100px;
+    }
+    #about p {
+        max-width: 90%;
+        margin-left: 5vw;
+        font-size: 1rem;
+    }
+    
+    .dot {
+        top: 100px;
+        left: 2vw;
+    }
+    
+    /* SKILLS SECTION CHANGES */
+    .skills-container {
+        grid-template-columns: 1fr; 
+        width: 90%;
+    }
+    #skills h2 {
+        font-size: 10vw;
+    }
+    .skillbox {
+        min-height: 150px;
+    }
+    
+    /* CONTACT SECTION CHANGES */
+    .contact-container {
+        gap: 20px;
+    }
+    .contact-item img {
+        width: 30px;
+        height: 30px;
+    }
+    .contact-item:first-child img {
+        width: 35px;
+        height: 25px;
+    }
+}

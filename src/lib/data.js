@@ -19,7 +19,7 @@ export const projects = [
     description:
       'An intelligent workspace that helps students plan, focus, and reflect. Combines scheduling, nudges, and lightweight analytics to keep momentum without feeling noisy.',
     stack: ['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'OpenAI API'],
-    liveUrl: 'https://synaptiq-eta.vercel.app/dashboard',
+    liveUrl: 'https://synaptiq-eta.vercel.app/',
     ctaLabel: 'Open Synaptiq',
     accent: 'from-sky-500/22 to-cyan-500/10',
   },

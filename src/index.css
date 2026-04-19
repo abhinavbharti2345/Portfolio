@@ -1,0 +1,239 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Outfit", "Segoe UI", sans-serif;
+  --font-heading: "Space Grotesk", "Outfit", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --color-surface: #1f2937;
+  --color-surface-elevated: #1f2937;
+  --color-accent-violet: #d1b38b;
+  --color-accent-blue: #7baecc;
+  --spacing-section: clamp(4rem, 10vw, 8rem);
+}
+
+:root {
+  --bg-0: #0b0f1a;
+  --bg-1: #111827;
+  --surface: #1f2937;
+  --surface-0: rgb(31 41 55 / 0.66);
+  --surface-1: rgb(31 41 55 / 0.8);
+  --text-strong: #f4eae0;
+  --text-soft: rgb(244 234 224 / 0.7);
+  --text-muted: rgb(244 234 224 / 0.5);
+
+  --accent-home: #d1b38b;
+  --accent-home-soft: #e8d2b5;
+  --accent-home-rgb: 209 179 139;
+
+  --accent-about: #c8b08e;
+  --accent-about-soft: #ead8c0;
+  --accent-about-rgb: 200 176 142;
+
+  --accent-projects: #78a8c7;
+  --accent-projects-soft: #b9d4e6;
+  --accent-projects-rgb: 120 168 199;
+
+  --accent-skills: #68a89f;
+  --accent-skills-soft: #b1d7d1;
+  --accent-skills-rgb: 104 168 159;
+
+  --accent-contact: #d1b38b;
+  --accent-contact-soft: #eedcc5;
+  --accent-contact-rgb: 209 179 139;
+
+  --section-accent: var(--accent-home);
+  --section-accent-soft: var(--accent-home-soft);
+  --section-accent-rgb: var(--accent-home-rgb);
+}
+
+@layer base {
+  html {
+    scroll-behavior: auto;
+    scroll-padding-top: 6rem;
+    scroll-snap-type: none;
+  }
+
+  body {
+    @apply overflow-x-hidden text-zinc-100 antialiased font-[family-name:var(--font-display)];
+    background: var(--bg-0);
+    color: var(--text-strong);
+    cursor: none;
+    transition: color 260ms ease;
+    scroll-snap-type: none;
+  }
+
+  body[data-section='top'] {
+    --section-accent: var(--accent-home);
+    --section-accent-soft: var(--accent-home-soft);
+    --section-accent-rgb: var(--accent-home-rgb);
+  }
+
+  body[data-section='about'] {
+    --section-accent: var(--accent-about);
+    --section-accent-soft: var(--accent-about-soft);
+    --section-accent-rgb: var(--accent-about-rgb);
+  }
+
+  body[data-section='hobbies'] {
+    --section-accent: var(--accent-about);
+    --section-accent-soft: var(--accent-about-soft);
+    --section-accent-rgb: var(--accent-about-rgb);
+  }
+
+  body[data-section='skills'] {
+    --section-accent: var(--accent-skills);
+    --section-accent-soft: var(--accent-skills-soft);
+    --section-accent-rgb: var(--accent-skills-rgb);
+  }
+
+  body[data-section='projects'] {
+    --section-accent: var(--accent-projects);
+    --section-accent-soft: var(--accent-projects-soft);
+    --section-accent-rgb: var(--accent-projects-rgb);
+  }
+
+  body[data-section='contact'] {
+    --section-accent: var(--accent-contact);
+    --section-accent-soft: var(--accent-contact-soft);
+    --section-accent-rgb: var(--accent-contact-rgb);
+  }
+
+  @media (pointer: coarse) {
+    body {
+      cursor: auto;
+    }
+  }
+
+  ::selection {
+    background: rgb(var(--section-accent-rgb) / 0.28);
+    color: #f4eae0;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.01em;
+  }
+}
+
+@layer utilities {
+  .glass {
+    background: linear-gradient(170deg, rgb(31 41 55 / 0.56), rgb(31 41 55 / 0.44));
+    border: 1px solid rgb(255 255 255 / 0.08);
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.04) inset,
+      0 16px 42px rgb(0 0 0 / 0.28);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .glass-strong {
+    background: linear-gradient(165deg, rgb(31 41 55 / 0.75), rgb(31 41 55 / 0.58));
+    border: 1px solid rgb(255 255 255 / 0.1);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .text-gradient {
+    background: linear-gradient(120deg, #f4eae0 0%, #ebdfd2 60%, #e2ccb0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .glow-ring {
+    box-shadow:
+      0 0 76px rgb(var(--section-accent-rgb) / 0.18),
+      0 0 40px rgb(var(--section-accent-rgb) / 0.11);
+  }
+
+  .section-shell {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.5rem;
+    border: 1px solid rgb(255 255 255 / 0.08);
+    background: linear-gradient(175deg, rgb(31 41 55 / 0.5), rgb(31 41 55 / 0.38));
+    box-shadow: 0 10px 30px rgb(0 0 0 / 0.22);
+  }
+
+  .about-panel {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.5rem;
+    border: 1px solid rgb(255 255 255 / 0.16);
+    background: linear-gradient(168deg, rgb(66 84 108 / 0.64), rgb(38 50 68 / 0.54));
+    backdrop-filter: blur(11px);
+    -webkit-backdrop-filter: blur(11px);
+    box-shadow:
+      0 20px 42px rgb(0 0 0 / 0.2),
+      0 0 0 1px rgb(255 255 255 / 0.08) inset;
+  }
+
+  .theme-about .about-panel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(130% 88% at 8% 0%, rgb(var(--section-accent-rgb) / 0.24), transparent 72%),
+      linear-gradient(180deg, rgb(255 255 255 / 0.08), transparent 42%);
+  }
+
+  .section-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(120% 72% at 20% 0%, rgb(var(--section-accent-rgb) / 0.09), transparent 72%);
+  }
+
+  .section-kicker {
+    color: var(--section-accent-soft);
+  }
+
+  .surface-divider {
+    border-color: rgb(255 255 255 / 0.08);
+  }
+
+  .readable-copy {
+    color: var(--text-soft);
+  }
+
+  .muted-copy {
+    color: var(--text-muted);
+  }
+
+  .theme-home {
+    --section-accent: var(--accent-home);
+    --section-accent-soft: var(--accent-home-soft);
+    --section-accent-rgb: var(--accent-home-rgb);
+  }
+
+  .theme-about,
+  .theme-hobbies {
+    --section-accent: var(--accent-about);
+    --section-accent-soft: var(--accent-about-soft);
+    --section-accent-rgb: var(--accent-about-rgb);
+  }
+
+  .theme-skills {
+    --section-accent: var(--accent-skills);
+    --section-accent-soft: var(--accent-skills-soft);
+    --section-accent-rgb: var(--accent-skills-rgb);
+  }
+
+  .theme-projects {
+    --section-accent: var(--accent-projects);
+    --section-accent-soft: var(--accent-projects-soft);
+    --section-accent-rgb: var(--accent-projects-rgb);
+  }
+
+  .theme-contact {
+    --section-accent: var(--accent-contact);
+    --section-accent-soft: var(--accent-contact-soft);
+    --section-accent-rgb: var(--accent-contact-rgb);
+  }
+}

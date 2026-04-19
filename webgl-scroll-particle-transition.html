@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scroll Particle Transition | Three.js + GLSL + GSAP</title>
+  <style>
+    :root {
+      --bg-a: #0f1420;
+      --bg-b: #1a2434;
+      --text-strong: #eff3f8;
+      --text-soft: #c9d2de;
+      --accent: #6f63b8;
+      --accent-next: #4b89c3;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      background: radial-gradient(120% 80% at 50% 0%, #26334a 0%, var(--bg-b) 45%, var(--bg-a) 100%);
+      color: var(--text-strong);
+      font-family: "Segoe UI", "Inter", system-ui, sans-serif;
+    }
+
+    /*
+      We keep a fixed WebGL canvas in the background and scroll a long page in front.
+      ScrollTrigger reads this scroll distance and drives shader + camera uniforms.
+    */
+    #webgl {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    #scroll-area {
+      position: relative;
+      z-index: 2;
+      height: 320vh;
+    }
+
+    .panel {
+      position: sticky;
+      top: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 2rem;
+    }
+
+    .hero-copy,
+    .next-copy {
+      width: min(64rem, 100%);
+      margin-inline: auto;
+      text-align: center;
+      background: linear-gradient(165deg, rgba(235, 241, 248, 0.09), rgba(235, 241, 248, 0.04));
+      border: 1px solid rgba(228, 234, 242, 0.18);
+      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.45);
+      border-radius: 1.5rem;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: clamp(1.25rem, 2.6vw, 2.2rem);
+    }
+
+    .hero-copy {
+      opacity: 1;
+      transform: translateY(0px);
+    }
+
+    .next-copy {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+
+    .eyebrow {
+      margin: 0;
+      color: #b9b0de;
+      font-size: 0.74rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    h1,
+    h2 {
+      margin: 0.7rem 0 0;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      font-size: clamp(1.7rem, 4.2vw, 3.25rem);
+    }
+
+    .desc {
+      margin: 1rem auto 0;
+      max-width: 58ch;
+      color: var(--text-soft);
+      line-height: 1.65;
+      font-size: clamp(0.96rem, 1.6vw, 1.08rem);
+    }
+
+    .next-copy .eyebrow {
+      color: #a6d0f0;
+    }
+
+    .next-copy h2 {
+      background: linear-gradient(120deg, #f6f9fd 0%, #dbe7f4 46%, #9fc5e8 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .grid {
+      margin-top: 1.4rem;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.85rem;
+      text-align: left;
+    }
+
+    .card {
+      border-radius: 1rem;
+      border: 1px solid rgba(228, 236, 245, 0.16);
+      background: linear-gradient(170deg, rgba(234, 241, 248, 0.11), rgba(234, 241, 248, 0.04));
+      color: #e6edf6;
+      padding: 0.85rem;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .fallback-note {
+      position: fixed;
+      left: 0.8rem;
+      bottom: 0.8rem;
+      z-index: 3;
+      font-size: 0.78rem;
+      color: #b2bfcd;
+      border: 1px solid rgba(229, 236, 245, 0.18);
+      background: rgba(17, 22, 33, 0.72);
+      border-radius: 999px;
+      padding: 0.45rem 0.7rem;
+      opacity: 0;
+      transition: opacity 220ms ease;
+    }
+
+    .fallback-note.show {
+      opacity: 1;
+    }
+
+    @media (max-width: 860px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      #scroll-area {
+        height: 280vh;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #webgl {
+        display: none;
+      }
+
+      #scroll-area {
+        height: auto;
+      }
+
+      .panel {
+        position: static;
+        min-height: auto;
+        padding-block: 1rem;
+      }
+
+      .next-copy {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="webgl" aria-hidden="true"></canvas>
+
+  <main id="scroll-area" aria-label="Scroll driven transition demo">
+    <section class="panel" id="page-a">
+      <div class="hero-copy" id="heroCopy">
+        <p class="eyebrow">Three.js Particle Transition</p>
+        <h1>Scroll to shatter the image into living pixels</h1>
+        <p class="desc">
+          This starts as one coherent image mapped on a point cloud. As scroll progress increases, each point is displaced with 3D noise and radial burst vectors, while the camera zooms through the cloud.
+        </p>
+      </div>
+    </section>
+
+    <section class="panel" id="page-b">
+      <div class="next-copy" id="nextCopy" aria-live="polite">
+        <p class="eyebrow">Next Page Content</p>
+        <h2>The viewport emerges into new content</h2>
+        <p class="desc">
+          Once particles fly past the camera, standard DOM content fades in. This keeps the transition cinematic while preserving regular HTML/CSS layout for accessibility and maintainability.
+        </p>
+        <div class="grid">
+          <article class="card">Performance: particle count is capped and downsampled from source image pixels.</article>
+          <article class="card">Resizing: camera aspect and renderer dimensions update on every viewport change.</article>
+          <article class="card">A11y: prefers-reduced-motion bypasses heavy motion and shows static content.</article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <p class="fallback-note" id="fallbackNote">Reduced motion enabled: using static transition.</p>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+
+  <script type="module">
+    import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    const canvas = document.getElementById("webgl");
+    const heroCopy = document.getElementById("heroCopy");
+    const nextCopy = document.getElementById("nextCopy");
+    const fallbackNote = document.getElementById("fallbackNote");
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (reduceMotion) {
+      fallbackNote.classList.add("show");
+      gsap.set(heroCopy, { opacity: 1, y: 0 });
+      gsap.set(nextCopy, { opacity: 1, y: 0 });
+    } else {
+      /* -------------------------------------------------------------
+         Scene setup
+      ------------------------------------------------------------- */
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, powerPreference: "high-performance" });
+      renderer.setClearColor(0x000000, 0);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 30);
+      camera.position.set(0, 0, 3.4);
+
+      const uniforms = {
+        uProgress: { value: 0.0 },
+        uTime: { value: 0.0 },
+        uTexture: { value: null },
+        uPointSize: { value: 2.4 },
+        uImageAspect: { value: 1.0 },
+        uViewportAspect: { value: window.innerWidth / window.innerHeight },
+        uDepthBoost: { value: 2.6 },
+        uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) }
+      };
+
+      const isMobile = /Android|iPhone|iPad|iPod|Mobi/i.test(navigator.userAgent);
+      const targetParticleCount = isMobile ? 42000 : 82000;
+
+    /* -------------------------------------------------------------
+       Build source image from an offscreen canvas so this file is
+       self-contained (no external image hosting required).
+    ------------------------------------------------------------- */
+    function createSourceImageCanvas(width = 1200, height = 1600) {
+      const c = document.createElement("canvas");
+      c.width = width;
+      c.height = height;
+      const ctx = c.getContext("2d", { willReadFrequently: true });
+
+      const grad = ctx.createLinearGradient(0, 0, width, height);
+      grad.addColorStop(0, "#cabdf4");
+      grad.addColorStop(0.34, "#8bbbe2");
+      grad.addColorStop(0.7, "#5a7fb9");
+      grad.addColorStop(1, "#2f3f5d");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, width, height);
+
+      const glowA = ctx.createRadialGradient(width * 0.34, height * 0.22, 0, width * 0.34, height * 0.22, width * 0.52);
+      glowA.addColorStop(0, "rgba(255, 255, 255, 0.72)");
+      glowA.addColorStop(0.45, "rgba(200, 220, 255, 0.18)");
+      glowA.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = glowA;
+      ctx.fillRect(0, 0, width, height);
+
+      const glowB = ctx.createRadialGradient(width * 0.68, height * 0.56, 0, width * 0.68, height * 0.56, width * 0.52);
+      glowB.addColorStop(0, "rgba(212, 200, 255, 0.35)");
+      glowB.addColorStop(0.5, "rgba(117, 155, 218, 0.12)");
+      glowB.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = glowB;
+      ctx.fillRect(0, 0, width, height);
+
+      // Decorative rings help make the cloud visually rich when reconstructed.
+      ctx.strokeStyle = "rgba(240, 245, 255, 0.22)";
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.ellipse(width * 0.5, height * 0.5, width * 0.34, height * 0.2, -0.3, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.strokeStyle = "rgba(144, 190, 235, 0.28)";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.ellipse(width * 0.5, height * 0.5, width * 0.24, height * 0.14, 0.36, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.font = "700 146px Segoe UI";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "rgba(246, 250, 255, 0.95)";
+      ctx.fillText("PIXEL CLOUD", width * 0.5, height * 0.52);
+
+      return c;
+    }
+
+    function buildParticleGeometry(sourceCanvas, desiredCount) {
+      const w = sourceCanvas.width;
+      const h = sourceCanvas.height;
+      const ctx = sourceCanvas.getContext("2d", { willReadFrequently: true });
+      const image = ctx.getImageData(0, 0, w, h).data;
+      const totalPixels = w * h;
+
+      // Downsample dynamically to keep count inside performance budget.
+      const step = Math.max(1, Math.floor(Math.sqrt(totalPixels / desiredCount)));
+
+      const positions = [];
+      const uvs = [];
+      const randoms = [];
+
+      for (let y = 0; y < h; y += step) {
+        for (let x = 0; x < w; x += step) {
+          const i = (y * w + x) * 4;
+          const a = image[i + 3] / 255;
+          if (a < 0.07) continue;
+
+          const u = x / (w - 1);
+          const v = 1.0 - y / (h - 1);
+
+          // Map UV to centered plane coordinates in clip-like space.
+          const px = (u - 0.5) * 2.0;
+          const py = (v - 0.5) * 2.0;
+
+          positions.push(px, py, 0);
+          uvs.push(u, v);
+          randoms.push(Math.random());
+        }
+      }
+
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+      geo.setAttribute("aUv", new THREE.Float32BufferAttribute(uvs, 2));
+      geo.setAttribute("aRandom", new THREE.Float32BufferAttribute(randoms, 1));
+
+      return geo;
+    }
+
+      const sourceCanvas = createSourceImageCanvas();
+      const texture = new THREE.CanvasTexture(sourceCanvas);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.minFilter = THREE.LinearFilter;
+      texture.magFilter = THREE.LinearFilter;
+      texture.generateMipmaps = false;
+
+      uniforms.uTexture.value = texture;
+      uniforms.uImageAspect.value = sourceCanvas.width / sourceCanvas.height;
+
+      const geometry = buildParticleGeometry(sourceCanvas, targetParticleCount);
+
+    const vertexShader = `
+      precision highp float;
+
+      attribute vec2 aUv;
+      attribute float aRandom;
+
+      uniform float uProgress;
+      uniform float uTime;
+      uniform float uPointSize;
+      uniform float uImageAspect;
+      uniform float uViewportAspect;
+      uniform float uDepthBoost;
+      uniform float uPixelRatio;
+
+      varying vec2 vUv;
+      varying float vAlpha;
+
+      // 3D simplex noise (Ashima Arts style).
+      // This noise gives smooth pseudo-random fields in xyz space, used for turbulence.
+      vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+      vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+      vec4 permute(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
+      vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+
+      float snoise(vec3 v) {
+        const vec2 C = vec2(1.0 / 6.0, 1.0 / 3.0);
+        const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+
+        vec3 i = floor(v + dot(v, C.yyy));
+        vec3 x0 = v - i + dot(i, C.xxx);
+
+        vec3 g = step(x0.yzx, x0.xyz);
+        vec3 l = 1.0 - g;
+        vec3 i1 = min(g.xyz, l.zxy);
+        vec3 i2 = max(g.xyz, l.zxy);
+
+        vec3 x1 = x0 - i1 + C.xxx;
+        vec3 x2 = x0 - i2 + C.yyy;
+        vec3 x3 = x0 - D.yyy;
+
+        i = mod289(i);
+        vec4 p = permute(permute(permute(
+          i.z + vec4(0.0, i1.z, i2.z, 1.0))
+          + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+          + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+
+        float n_ = 0.142857142857;
+        vec3 ns = n_ * D.wyz - D.xzx;
+
+        vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+        vec4 x_ = floor(j * ns.z);
+        vec4 y_ = floor(j - 7.0 * x_);
+
+        vec4 x = x_ * ns.x + ns.yyyy;
+        vec4 y = y_ * ns.x + ns.yyyy;
+        vec4 h = 1.0 - abs(x) - abs(y);
+
+        vec4 b0 = vec4(x.xy, y.xy);
+        vec4 b1 = vec4(x.zw, y.zw);
+
+        vec4 s0 = floor(b0) * 2.0 + 1.0;
+        vec4 s1 = floor(b1) * 2.0 + 1.0;
+        vec4 sh = -step(h, vec4(0.0));
+
+        vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
+        vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
+
+        vec3 p0 = vec3(a0.xy, h.x);
+        vec3 p1 = vec3(a0.zw, h.y);
+        vec3 p2 = vec3(a1.xy, h.z);
+        vec3 p3 = vec3(a1.zw, h.w);
+
+        vec4 norm = taylorInvSqrt(vec4(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3)));
+        p0 *= norm.x;
+        p1 *= norm.y;
+        p2 *= norm.z;
+        p3 *= norm.w;
+
+        vec4 m = max(0.6 - vec4(dot(x0, x0), dot(x1, x1), dot(x2, x2), dot(x3, x3)), 0.0);
+        m = m * m;
+
+        return 42.0 * dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
+      }
+
+      void main() {
+        vUv = aUv;
+
+        // Keep image shape regardless of viewport by compensating aspect mismatch.
+        vec3 base = position;
+        if (uImageAspect > uViewportAspect) {
+          base.y *= (uViewportAspect / uImageAspect);
+        } else {
+          base.x *= (uImageAspect / uViewportAspect);
+        }
+
+        float p = clamp(uProgress, 0.0, 1.0);
+        float eased = smoothstep(0.0, 1.0, p);
+
+        // Outward radial direction from image center.
+        vec3 radialDir = normalize(vec3(base.xy * 1.25, (aRandom - 0.5) * 1.25) + 0.0001);
+
+        // Three decorrelated noise lookups generate 3D turbulence.
+        float nX = snoise(vec3(base.xy * 2.7, uTime * 0.35 + aRandom * 11.0));
+        float nY = snoise(vec3(base.xy * 2.1 + 7.3, uTime * 0.31 + aRandom * 13.0));
+        float nZ = snoise(vec3(base.xy * 2.4 - 5.2, uTime * 0.28 + aRandom * 9.0));
+        vec3 turbulence = vec3(nX, nY, nZ);
+
+        // 1) radial burst pushes particles away from center.
+        // 2) turbulence adds organic breakup so motion is not uniform.
+        // 3) extra z term pulls points through camera for the fly-through feel.
+        vec3 displaced = base;
+        displaced += radialDir * (0.55 + aRandom * 2.7) * pow(eased, 1.2);
+        displaced += turbulence * (0.33 + aRandom * 0.55) * eased;
+        displaced.z += (aRandom * 2.0 - 1.0) * uDepthBoost * pow(eased, 1.5);
+
+        // Fade particles as transition nears completion so DOM content can take over cleanly.
+        vAlpha = 1.0 - smoothstep(0.7, 1.0, p);
+
+        vec4 mv = modelViewMatrix * vec4(displaced, 1.0);
+        gl_Position = projectionMatrix * mv;
+
+        // Perspective-correct point size: farther particles look smaller.
+        float size = uPointSize * (1.0 + aRandom * 0.8) * uPixelRatio;
+        gl_PointSize = size * (1.35 / max(0.12, -mv.z));
+      }
+    `;
+
+    const fragmentShader = `
+      precision highp float;
+
+      uniform sampler2D uTexture;
+      varying vec2 vUv;
+      varying float vAlpha;
+
+      void main() {
+        // Create circular points (soft edged sprites).
+        vec2 d = gl_PointCoord - 0.5;
+        float r = length(d);
+        float circle = smoothstep(0.52, 0.08, r);
+
+        // Sample original image color by each particle's UV.
+        vec4 tex = texture2D(uTexture, vUv);
+
+        // Slightly boost highlights for depth and readability.
+        vec3 color = pow(tex.rgb, vec3(0.92));
+        float alpha = tex.a * circle * vAlpha;
+
+        if (alpha < 0.02) discard;
+        gl_FragColor = vec4(color, alpha);
+      }
+    `;
+
+      const material = new THREE.ShaderMaterial({
+        uniforms,
+        vertexShader,
+        fragmentShader,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.NormalBlending
+      });
+
+      const points = new THREE.Points(geometry, material);
+      scene.add(points);
+
+    /* -------------------------------------------------------------
+       Scroll-driven timeline
+    ------------------------------------------------------------- */
+      const transition = { progress: 0 };
+
+      gsap.timeline({
+        defaults: { ease: "none" },
+        scrollTrigger: {
+          trigger: "#scroll-area",
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 1,
+          invalidateOnRefresh: true
+        }
+      })
+        .to(transition, {
+          progress: 1,
+          onUpdate: () => {
+            uniforms.uProgress.value = transition.progress;
+
+            // Camera fly-through synced with disintegration.
+            camera.position.z = THREE.MathUtils.lerp(3.4, 0.55, transition.progress);
+
+            // DOM overlays crossfade near the end of particle pass.
+            const p = transition.progress;
+            const heroFade = 1.0 - THREE.MathUtils.smoothstep(p, 0.22, 0.64);
+            const nextFade = THREE.MathUtils.smoothstep(p, 0.58, 0.88);
+
+            gsap.set(heroCopy, { opacity: heroFade, y: (1.0 - heroFade) * -24 });
+            gsap.set(nextCopy, { opacity: nextFade, y: (1.0 - nextFade) * 26 });
+          }
+        }, 0);
+
+    /* -------------------------------------------------------------
+       Resize handling
+    ------------------------------------------------------------- */
+      function onResize() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(w, h);
+
+        uniforms.uViewportAspect.value = w / h;
+        uniforms.uPixelRatio.value = Math.min(window.devicePixelRatio, 2);
+      }
+
+      window.addEventListener("resize", onResize);
+
+    /* -------------------------------------------------------------
+       Render loop
+    ------------------------------------------------------------- */
+      const clock = new THREE.Clock();
+
+      function render() {
+        uniforms.uTime.value = clock.getElapsedTime();
+        renderer.render(scene, camera);
+        requestAnimationFrame(render);
+      }
+
+      render();
+
+      // Initial layout refresh so ScrollTrigger picks exact dimensions.
+      ScrollTrigger.refresh();
+    }
+  </script>
+</body>
+</html>

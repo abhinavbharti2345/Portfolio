@@ -45,11 +45,13 @@ export const projects = [
   },
   {
     id: 'daily-motivation',
-    name: 'Daily Motivation Dashboard',
-    tagline: 'Calm dashboard for streaks and rituals',
+    name: 'Lumora',
+    tagline: 'Daily quote website for focus and positivity',
     description:
-      'A minimal dashboard that tracks streaks, surfaces quotes, and keeps daily rituals lightweight. Designed to reward consistency without guilt.',
+      'A clean daily quote website that serves uplifting quotes to start the day with clarity and motivation. Built for a calm reading experience with simple, distraction-free interactions.',
     stack: ['React', 'Tailwind', 'Charts', 'Local storage'],
+    liveUrl: 'https://daily-motivation-dashboard-two.vercel.app/',
+    ctaLabel: 'Open Dashboard',
     accent: 'from-blue-500/20 to-sky-500/10',
   },
   {

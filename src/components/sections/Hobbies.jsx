@@ -82,7 +82,7 @@ function HobbiesComponent() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: '-10%' }}
-          className="mt-12 grid gap-5 md:grid-cols-3"
+          className="mt-12 grid items-start gap-5 md:grid-cols-3"
         >
           {hobbies.map((h) => {
             const isGaming = h.title.toLowerCase() === 'gaming'
@@ -113,7 +113,7 @@ function HobbiesComponent() {
                 boxShadow:
                   '0 28px 90px rgba(0,0,0,0.55), 0 0 0 1px rgb(var(--section-accent-rgb) / 0.26)',
               }}
-              className="glass flex flex-col gap-4 rounded-3xl p-6 transition-colors duration-300"
+              className="glass self-start flex flex-col gap-4 rounded-3xl p-6 transition-colors duration-300"
             >
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5">
                 <Icon name={h.icon} />
